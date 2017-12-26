@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AirDemo.Domain;
+using AirDemo.Service;
+using AirDemo.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDemo.Api.Controllers
@@ -10,72 +10,53 @@ namespace AirDemo.Api.Controllers
     [Route("api/[controller]")]
     public class AirplanesController : Controller
     {
-        private readonly AirplaneContext _context;
+        private readonly IAirplaneService _service;
 
-        public AirplanesController(AirplaneContext context)
+        public AirplanesController(IAirplaneService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET api/airplanes
         [HttpGet]
-        public async Task<IEnumerable<Airplane>> Get()
+        public async Task<IEnumerable<AirplaneResponse>> Get()
         {
-            return await _context.Airplanes.ToAsyncEnumerable().ToList();
+            return await _service.GetAirplanes();
         }
 
         // GET api/airplanes/12345
         [HttpGet("{sn}")]
-        public async Task<Airplane> Get(string sn)
+        public async Task<AirplaneResponse> Get(string sn)
         {
-            return await _context.Airplanes.Where(x => x.SerialNumber == sn).ToAsyncEnumerable().FirstOrDefault();
+            return await _service.GetAirplane(sn);
         }
 
         // POST api/airplanes
         [HttpPost]
-        public async Task Post([FromBody]Airplane request)
+        public async Task Post([FromBody]AirplaneAddRequest request)
         {
-            _context.Add(request);
-            await _context.SaveChangesAsync();
+            await _service.RegisterNewAirplane(request);
         }
 
         // PUT api/airplanes/12345/fly
         [HttpPut("{sn}/fly")]
-        public async Task Fly(string sn, [FromBody]TimeSpan estimatedTripTime)
+        public async Task Fly(string sn, [FromBody]AirplaneFlyRequest request)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
-            {
-                airplane.Fly(estimatedTripTime);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.FlyAirplane(sn, request);
         }
 
         // PUT api/airplanes/12345/land
         [HttpPut("{sn}/land")]
-        public async Task Land(string sn, [FromBody]string airportCode)
+        public async Task Land(string sn, [FromBody]AirplaneLandRequest request)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
-            {
-                airplane.Land(airportCode);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.LandAirplane(sn, request);
         }
 
         // DELETE api/airplanes/12345
         [HttpDelete("{sn}")]
         public async Task Delete(string sn)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
-            {
-                _context.Airplanes.Remove(airplane);
-            }
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAirplane(sn);
         }
     }
 }

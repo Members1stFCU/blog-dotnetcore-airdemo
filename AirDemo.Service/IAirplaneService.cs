@@ -9,8 +9,10 @@ namespace AirDemo.Service
     public interface IAirplaneService
     {
         Task<IEnumerable<AirplaneResponse>> GetAirplanes();
-        Task RegisterNewAirplane(AirplaneAddRequest plane);
-        Task FlyAirplane(AirplaneFlyRequest flyRequest);
-        Task LandAirplane(AirplaneLandRequest landRequest);
+        Task<AirplaneResponse> GetAirplane(string serialNumber);
+        Task RegisterNewAirplane(AirplaneAddRequest addRequest);
+        Task FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest);
+        Task LandAirplane(string serialNumber, AirplaneLandRequest landRequest);
+        Task DeleteAirplane(string serialNumber);
     }
 }

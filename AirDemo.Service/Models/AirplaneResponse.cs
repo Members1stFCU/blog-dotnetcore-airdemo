@@ -4,7 +4,6 @@ namespace AirDemo.Service.Models
 {
     public class AirplaneResponse
     {
-        
         public string ModelNumber { get; set; }
         
         public string SerialNumber { get; set; }
