@@ -40,37 +40,43 @@ namespace AirDemo.Service
             await _context.SaveChangesAsync();
         }
 
-        public async Task FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest)
+        public async Task<bool> FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest)
         {
             var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
-            if (airplane != null)
+            if (airplane == null)
             {
-                airplane.Fly(flyRequest.EstimatedTripTime);
+                return false;
             }
 
+            airplane.Fly(flyRequest.EstimatedTripTime);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task LandAirplane(string serialNumber, AirplaneLandRequest landRequest)
+        public async Task<bool> LandAirplane(string serialNumber, AirplaneLandRequest landRequest)
         {
             var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
-            if (airplane != null)
+            if (airplane == null)
             {
-                airplane.Land(landRequest.AirportCode);
+                return false;
             }
 
+            airplane.Land(landRequest.AirportCode);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task DeleteAirplane(string serialNumber)
+        public async Task<bool> DeleteAirplane(string serialNumber)
         {
             var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
-            if (airplane != null)
+            if (airplane == null)
             {
-                _context.Airplanes.Remove(airplane);
+                return false;
             }
 
+            _context.Airplanes.Remove(airplane);
             await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -11,8 +11,8 @@ namespace AirDemo.Service
         Task<IEnumerable<AirplaneResponse>> GetAirplanes();
         Task<AirplaneResponse> GetAirplane(string serialNumber);
         Task RegisterNewAirplane(AirplaneAddRequest addRequest);
-        Task FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest);
-        Task LandAirplane(string serialNumber, AirplaneLandRequest landRequest);
-        Task DeleteAirplane(string serialNumber);
+        Task<bool> FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest);
+        Task<bool> LandAirplane(string serialNumber, AirplaneLandRequest landRequest);
+        Task<bool> DeleteAirplane(string serialNumber);
     }
 }
