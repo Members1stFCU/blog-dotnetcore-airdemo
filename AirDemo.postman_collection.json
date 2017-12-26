@@ -1,0 +1,172 @@
+{
+	"info": {
+		"name": "AirDemo",
+		"_postman_id": "02f17c26-bbe8-1057-01d7-e321ba2e594a",
+		"description": "The collection for the .NET Core blog series written by Evan Kaiser for the Members 1st FCU blog.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Airplanes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get Single Airplane",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes/12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes",
+						"12345"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Airplane",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes/12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes",
+						"12345"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add Airplane",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"SerialNumber\": \"12345\",\n\t\"ModelNumber\": \"NCC-1701\",\n\t\"SeatCount\": 100,\n\t\"WeightInKilos\": 1000000\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Fly Airplane",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"EstimatedTripTime\": \"05:30:00\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes/12345/fly",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes",
+						"12345",
+						"fly"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Land Airplane",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"AirportCode\": \"BWI\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/airplanes/12345/land",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"airplanes",
+						"12345",
+						"land"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
