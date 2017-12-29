@@ -6,6 +6,6 @@ namespace AirDemo.Service.Models
     public class AirplaneFlyRequest
     {
         [Required]
-        public TimeSpan EstimatedTripTime { get; set; }
+        public TimeSpan? EstimatedTripTime { get; set; }
     }
 }

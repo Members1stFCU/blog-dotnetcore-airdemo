@@ -44,6 +44,11 @@ namespace AirDemo.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]AirplaneAddRequest request)
         {
+            if (!this.ModelState.IsValid)
+            {
+                return BadRequest(this.ModelState);
+            }
+
             await _service.RegisterNewAirplane(request);
             var plane = await _service.GetAirplane(request.SerialNumber);
             if (plane == null)
@@ -62,6 +67,11 @@ namespace AirDemo.Api.Controllers
         [HttpPut("{sn}/fly")]
         public async Task<IActionResult> Fly(string sn, [FromBody]AirplaneFlyRequest request)
         {
+            if (!this.ModelState.IsValid)
+            {
+                return BadRequest(this.ModelState);
+            }
+
             if (await _service.FlyAirplane(sn, request))
             {
                 // Return a 200, but provide the resource in the state it exists in after the request (courtesy to client to avoid another GET request)
@@ -76,6 +86,11 @@ namespace AirDemo.Api.Controllers
         [HttpPut("{sn}/land")]
         public async Task<IActionResult> Land(string sn, [FromBody]AirplaneLandRequest request)
         {
+            if (!this.ModelState.IsValid)
+            {
+                return BadRequest(this.ModelState);
+            }
+
             if (await _service.LandAirplane(sn, request))
             {
                 // Return a 200, but provide the resource in the state it exists in after the request (courtesy to client to avoid another GET request)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace AirDemo.Service
 
         public async Task RegisterNewAirplane(AirplaneAddRequest addRequest)
         {
-            var airplane = new Airplane(addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount, addRequest.WeightInKilos);
+            var airplane = new Airplane(addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
             _context.Add(airplane);
             await _context.SaveChangesAsync();
         }
@@ -48,7 +49,7 @@ namespace AirDemo.Service
                 return false;
             }
 
-            airplane.Fly(flyRequest.EstimatedTripTime);
+            airplane.Fly(flyRequest.EstimatedTripTime ?? new TimeSpan(0, 0, 0));
             await _context.SaveChangesAsync();
             return true;
         }

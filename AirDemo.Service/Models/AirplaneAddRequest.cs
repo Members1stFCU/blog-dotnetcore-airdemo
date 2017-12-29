@@ -11,9 +11,9 @@ namespace AirDemo.Service.Models
         public string SerialNumber { get; set; }
         
         [Required]
-        public int SeatCount { get; set; }
+        public int? SeatCount { get; set; }
         
         [Required]
-        public decimal WeightInKilos { get; set; }
+        public decimal? WeightInKilos { get; set; }
     }
 }
