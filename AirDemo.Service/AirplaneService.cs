@@ -33,7 +33,7 @@ namespace AirDemo.Service
                 .Where(x => x.SerialNumber == serialNumber)
                 .ProjectTo<AirplaneResponse>(_map)
                 .ToAsyncEnumerable()                
-                .FirstOrDefault();
+                .SingleOrDefault();
         }
 
         public async Task RegisterNewAirplane(AirplaneAddRequest addRequest)
