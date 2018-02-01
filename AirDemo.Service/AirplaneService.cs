@@ -29,8 +29,10 @@ namespace AirDemo.Service
 
         public async Task<AirplaneResponse> GetAirplane(string serialNumber)
         {
-            return await _context.Airplanes.ProjectTo<AirplaneResponse>(_map).ToAsyncEnumerable()
+            return await _context.Airplanes
                 .Where(x => x.SerialNumber == serialNumber)
+                .ProjectTo<AirplaneResponse>(_map)
+                .ToAsyncEnumerable()                
                 .FirstOrDefault();
         }
 
