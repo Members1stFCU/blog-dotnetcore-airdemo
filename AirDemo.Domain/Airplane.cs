@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace AirDemo.Domain
 {
@@ -6,15 +7,28 @@ namespace AirDemo.Domain
     {
         private Airplane()
         {
+            this.AirplaneId = Guid.NewGuid();
         }
 
-        public Airplane(string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
+        public static Airplane RegisterNewAirplane(AirplaneContext context, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
         {
-            this.AirplaneId = Guid.NewGuid();
-            this.ModelNumber = modelNumber;
-            this.SerialNumber = serialNumber;
-            this.SeatCount = seatCount;
-            this.WeightInKilos = weightInKilos;
+            var plane = new Airplane
+            {
+                ModelNumber = modelNumber,
+                SerialNumber = serialNumber,
+                SeatCount = seatCount,
+                WeightInKilos = weightInKilos
+            };
+
+            if (context.Airplanes.Where(x => x.SerialNumber == serialNumber).Any())
+            {
+                return null;
+            }
+            else
+            {
+                context.Airplanes.Add(plane);
+                return plane;
+            }
         }
 
         public virtual Guid AirplaneId { get; private set; }

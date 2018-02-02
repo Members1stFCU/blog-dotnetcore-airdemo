@@ -38,9 +38,11 @@ namespace AirDemo.Service
 
         public async Task RegisterNewAirplane(AirplaneAddRequest addRequest)
         {
-            var airplane = new Airplane(addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
-            _context.Add(airplane);
-            await _context.SaveChangesAsync();
+            var airplane = Airplane.RegisterNewAirplane(_context, addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
+            if (airplane != null)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<bool> FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest)
