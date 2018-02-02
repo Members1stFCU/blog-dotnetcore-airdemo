@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AirDemo.Domain;
+using AirDemo.Service;
+using AirDemo.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AirDemo.Api.Controllers
@@ -10,72 +10,109 @@ namespace AirDemo.Api.Controllers
     [Route("api/[controller]")]
     public class AirplanesController : Controller
     {
-        private readonly AirplaneContext _context;
+        private readonly IAirplaneService _service;
 
-        public AirplanesController(AirplaneContext context)
+        public AirplanesController(IAirplaneService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET api/airplanes
         [HttpGet]
-        public async Task<IEnumerable<Airplane>> Get()
+        public async Task<IEnumerable<AirplaneResponse>> Get()
         {
-            return await _context.Airplanes.ToAsyncEnumerable().ToList();
+            return await _service.GetAirplanes();
         }
 
         // GET api/airplanes/12345
         [HttpGet("{sn}")]
-        public async Task<Airplane> Get(string sn)
+        public async Task<IActionResult> Get(string sn)
         {
-            return await _context.Airplanes.Where(x => x.SerialNumber == sn).ToAsyncEnumerable().FirstOrDefault();
+            var plane = await _service.GetAirplane(sn);
+            if (plane == null)
+            {
+                // Requested a resource that doesn't exist, so return a 404
+                return NotFound();
+            }
+            else
+            {
+                return Ok(plane);
+            }
         }
 
         // POST api/airplanes
         [HttpPost]
-        public async Task Post([FromBody]Airplane request)
+        public async Task<IActionResult> Post([FromBody]AirplaneAddRequest request)
         {
-            _context.Add(request);
-            await _context.SaveChangesAsync();
+            if (!this.ModelState.IsValid)
+            {
+                return BadRequest(this.ModelState);
+            }
+
+            await _service.RegisterNewAirplane(request);
+            var plane = await _service.GetAirplane(request.SerialNumber);
+            if (plane == null)
+            {
+                // There was some reason the resource does not exist in the database, so something was wrong with the request, return 400
+                return BadRequest();
+            }
+            else
+            {
+                // Return 201 with the Location header indicating how to retrieve the resource, and the state of the resource after it was created
+                return Created($"api/airplanes/{request.SerialNumber}", plane);
+            }
         }
 
         // PUT api/airplanes/12345/fly
         [HttpPut("{sn}/fly")]
-        public async Task Fly(string sn, [FromBody]TimeSpan estimatedTripTime)
+        public async Task<IActionResult> Fly(string sn, [FromBody]AirplaneFlyRequest request)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
+            if (!this.ModelState.IsValid)
             {
-                airplane.Fly(estimatedTripTime);
+                return BadRequest(this.ModelState);
             }
 
-            await _context.SaveChangesAsync();
+            if (await _service.FlyAirplane(sn, request))
+            {
+                // Return a 200, but provide the resource in the state it exists in after the request (courtesy to client to avoid another GET request)
+                return Ok(await _service.GetAirplane(sn));
+            }
+
+            // The service indicated a failure which at this point means it is not found as no other known paths would return false, so return a 404
+            return NotFound();
         }
 
         // PUT api/airplanes/12345/land
         [HttpPut("{sn}/land")]
-        public async Task Land(string sn, [FromBody]string airportCode)
+        public async Task<IActionResult> Land(string sn, [FromBody]AirplaneLandRequest request)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
+            if (!this.ModelState.IsValid)
             {
-                airplane.Land(airportCode);
+                return BadRequest(this.ModelState);
             }
 
-            await _context.SaveChangesAsync();
+            if (await _service.LandAirplane(sn, request))
+            {
+                // Return a 200, but provide the resource in the state it exists in after the request (courtesy to client to avoid another GET request)
+                return Ok(await _service.GetAirplane(sn));
+            }
+
+            // The service indicated a failure which at this point means it is not found as no other known paths would return false, so return a 404
+            return NotFound();
         }
 
         // DELETE api/airplanes/12345
         [HttpDelete("{sn}")]
-        public async Task Delete(string sn)
+        public async Task<IActionResult> Delete(string sn)
         {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == sn).FirstOrDefault();
-            if (airplane != null)
+            if (await _service.DeleteAirplane(sn))
             {
-                _context.Airplanes.Remove(airplane);
+                // The resource no longer exists and there's nothing else to return, so return a 204
+                return NoContent();
             }
 
-            await _context.SaveChangesAsync();
+            // The service indicated a failure which at this point means it is not found as no other known paths would return false, so return a 404
+            return NotFound();
         }
     }
 }
