@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using My.Feed.Services;
 
 namespace AirDemo.Domain
 {
@@ -6,15 +8,26 @@ namespace AirDemo.Domain
     {
         private Airplane()
         {
+            this.AirplaneId = Guid.NewGuid();
         }
 
-        public Airplane(string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
+        public static Result RegisterNewAirplane(AirplaneContext context, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
         {
-            this.AirplaneId = Guid.NewGuid();
-            this.ModelNumber = modelNumber;
-            this.SerialNumber = serialNumber;
-            this.SeatCount = seatCount;
-            this.WeightInKilos = weightInKilos;
+            var plane = new Airplane
+            {
+                ModelNumber = modelNumber,
+                SerialNumber = serialNumber,
+                SeatCount = seatCount,
+                WeightInKilos = weightInKilos
+            };
+
+            var result = plane.IsDuplicate(context);
+            if (result)
+            {
+                context.Airplanes.Add(plane);
+            }
+
+            return result;
         }
 
         public virtual Guid AirplaneId { get; private set; }
@@ -33,18 +46,30 @@ namespace AirDemo.Domain
         
         public virtual DateTimeOffset? EstimatedLandingTime { get; private set; }
 
-        public virtual void Fly(TimeSpan estimatedTripTime)
+        public virtual Result Fly(TimeSpan estimatedTripTime)
         {
             this.CurrentAirportCode = null;
             this.LastTakeoffTime = DateTimeOffset.Now;
             this.EstimatedLandingTime = DateTimeOffset.Now.Add(estimatedTripTime);
+            return new SuccessResult();
         }
 
-        public virtual void Land(string airportCode)
+        public virtual Result Land(string airportCode)
         {
             this.CurrentAirportCode = airportCode;
             this.LastTakeoffTime = null;
             this.EstimatedLandingTime = null;
+            return new SuccessResult();
+        }
+
+        private Result IsDuplicate(AirplaneContext context)
+        {
+            if (context.Airplanes.Any(x => x.AirplaneId != this.AirplaneId && x.SerialNumber == this.SerialNumber))
+            {
+                return new FailResult($"The Serial # {this.SerialNumber} is already taken.");
+            }
+            
+            return new SuccessResult();
         }
     }
 }

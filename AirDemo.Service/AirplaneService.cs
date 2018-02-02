@@ -6,6 +6,7 @@ using AirDemo.Domain;
 using AirDemo.Service.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using My.Feed.Services;
 
 namespace AirDemo.Service
 {
@@ -36,50 +37,68 @@ namespace AirDemo.Service
                 .SingleOrDefault();
         }
 
-        public async Task RegisterNewAirplane(AirplaneAddRequest addRequest)
+        public async Task<Result> RegisterNewAirplane(AirplaneAddRequest addRequest)
         {
-            var airplane = new Airplane(addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
-            _context.Add(airplane);
-            await _context.SaveChangesAsync();
-        }
+            var result = Airplane.RegisterNewAirplane(_context, addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
 
-        public async Task<bool> FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest)
-        {
-            var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
-            if (airplane == null)
+            // Check if action was successful
+            if (result)
             {
-                return false;
+                await _context.SaveChangesAsync();
+                var updatedPlane = await this.GetAirplane(addRequest.SerialNumber);
+
+                // Pass back a DataResult with the inner Data being the AirplaneResponse queried above
+                return SuccessResult.WithData(updatedPlane);
             }
 
-            airplane.Fly(flyRequest.EstimatedTripTime ?? new TimeSpan(0, 0, 0));
-            await _context.SaveChangesAsync();
-            return true;
+            return result;
         }
 
-        public async Task<bool> LandAirplane(string serialNumber, AirplaneLandRequest landRequest)
+        public async Task<Result> FlyAirplane(string serialNumber, AirplaneFlyRequest flyRequest)
         {
             var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
             if (airplane == null)
             {
-                return false;
+                return new FailResult($"Airplane with Serial # {serialNumber} not found.");
             }
 
-            airplane.Land(landRequest.AirportCode);
-            await _context.SaveChangesAsync();
-            return true;
+            var result = airplane.Fly(flyRequest.EstimatedTripTime ?? new TimeSpan(0, 0, 0));
+            if (result)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return result;
         }
 
-        public async Task<bool> DeleteAirplane(string serialNumber)
+        public async Task<Result> LandAirplane(string serialNumber, AirplaneLandRequest landRequest)
         {
             var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
             if (airplane == null)
             {
-                return false;
+                return new FailResult($"Airplane with Serial # {serialNumber} not found.");
+            }
+
+            var result = airplane.Land(landRequest.AirportCode);
+            if (result)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return result;
+        }
+
+        public async Task<Result> DeleteAirplane(string serialNumber)
+        {
+            var airplane = _context.Airplanes.Where(x => x.SerialNumber == serialNumber).FirstOrDefault();
+            if (airplane == null)
+            {
+                return new FailResult($"Airplane with Serial # {serialNumber} not found.");
             }
 
             _context.Airplanes.Remove(airplane);
             await _context.SaveChangesAsync();
-            return true;
+            return new SuccessResult();
         }
     }
 }
