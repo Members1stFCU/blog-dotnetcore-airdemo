@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using My.Feed.Services;
 
 namespace AirDemo.Domain
 {
@@ -10,7 +11,7 @@ namespace AirDemo.Domain
             this.AirplaneId = Guid.NewGuid();
         }
 
-        public static Airplane RegisterNewAirplane(AirplaneContext context, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
+        public static Result RegisterNewAirplane(AirplaneContext context, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
         {
             var plane = new Airplane
             {
@@ -20,15 +21,13 @@ namespace AirDemo.Domain
                 WeightInKilos = weightInKilos
             };
 
-            if (context.Airplanes.Where(x => x.SerialNumber == serialNumber).Any())
-            {
-                return null;
-            }
-            else
+            var result = plane.IsDuplicate(context);
+            if (result)
             {
                 context.Airplanes.Add(plane);
-                return plane;
             }
+
+            return result;
         }
 
         public virtual Guid AirplaneId { get; private set; }
@@ -59,6 +58,16 @@ namespace AirDemo.Domain
             this.CurrentAirportCode = airportCode;
             this.LastTakeoffTime = null;
             this.EstimatedLandingTime = null;
+        }
+
+        private Result IsDuplicate(AirplaneContext context)
+        {
+            if (context.Airplanes.Any(x => x.AirplaneId != this.AirplaneId && x.SerialNumber == this.SerialNumber))
+            {
+                return new FailResult($"The Serial # {this.SerialNumber} is already taken.");
+            }
+            
+            return new SuccessResult();
         }
     }
 }

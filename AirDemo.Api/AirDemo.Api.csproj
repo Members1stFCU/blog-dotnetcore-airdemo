@@ -15,5 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AirDemo.Domain\AirDemo.Domain.csproj" />
     <ProjectReference Include="..\AirDemo.Service\AirDemo.Service.csproj" />
+    <ProjectReference Include="..\My.Feed\My.Feed.csproj" />
   </ItemGroup>
 </Project>
