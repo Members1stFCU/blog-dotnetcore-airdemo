@@ -4,7 +4,7 @@ This is a demo project that is used as a resource to go along with the following
 
 1. [Setting up .NET Core](http://devblog.members1st.org/setting-up-dotnet-core)
 2. [.NET Core REST API in About 30 Minutes](http://devblog.members1st.org/dotnet-core-rest-api-in-about-30-minutes)
-3. [.NET Core Request/Response](../dotnet-core-request-response)
+3. [.NET Core Request/Response](http://devblog.members1st.org/dotnet-core-request-response)
 
 In each post (starting with #3), there will be information at the beginning about which branch of this repo to checkout, which will provide the project as it was at the end of the previous post.
 
