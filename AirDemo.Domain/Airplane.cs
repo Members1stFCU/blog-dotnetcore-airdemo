@@ -46,18 +46,20 @@ namespace AirDemo.Domain
         
         public virtual DateTimeOffset? EstimatedLandingTime { get; private set; }
 
-        public virtual void Fly(TimeSpan estimatedTripTime)
+        public virtual Result Fly(TimeSpan estimatedTripTime)
         {
             this.CurrentAirportCode = null;
             this.LastTakeoffTime = DateTimeOffset.Now;
             this.EstimatedLandingTime = DateTimeOffset.Now.Add(estimatedTripTime);
+            return new SuccessResult();
         }
 
-        public virtual void Land(string airportCode)
+        public virtual Result Land(string airportCode)
         {
             this.CurrentAirportCode = airportCode;
             this.LastTakeoffTime = null;
             this.EstimatedLandingTime = null;
+            return new SuccessResult();
         }
 
         private Result IsDuplicate(AirplaneContext context)

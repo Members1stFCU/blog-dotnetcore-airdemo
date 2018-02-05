@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AirDemo.Service;
 using AirDemo.Service.Models;
 using Microsoft.AspNetCore.Mvc;
+using My.Feed.Services;
 
 namespace AirDemo.Api.Controllers
 {
@@ -49,17 +50,16 @@ namespace AirDemo.Api.Controllers
                 return BadRequest(this.ModelState);
             }
 
-            await _service.RegisterNewAirplane(request);
-            var plane = await _service.GetAirplane(request.SerialNumber);
-            if (plane == null)
+            var result = await _service.RegisterNewAirplane(request);
+            if (result)
             {
-                // There was some reason the resource does not exist in the database, so something was wrong with the request, return 400
-                return BadRequest();
+                // Return 201 with the Location header indicating how to retrieve the resource, and the state of the resource after it was created
+                return Created($"api/airplanes/{request.SerialNumber}", (result as DataResult<AirplaneResponse>)?.Data);
             }
             else
             {
-                // Return 201 with the Location header indicating how to retrieve the resource, and the state of the resource after it was created
-                return Created($"api/airplanes/{request.SerialNumber}", plane);
+                // There was some reason the resource does not exist in the database, so something was wrong with the request, return 400
+                return BadRequest(result.Error);
             }
         }
 

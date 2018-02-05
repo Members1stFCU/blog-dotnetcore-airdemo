@@ -63,6 +63,11 @@ namespace My.Feed.Services
             : base(true)
         {
         }
+
+        public static DataResult<T> WithData<T>(T data)
+        {
+            return new DataResult<T>(data);
+        }
     }
 
     public class DataResult<T> : SuccessResult
