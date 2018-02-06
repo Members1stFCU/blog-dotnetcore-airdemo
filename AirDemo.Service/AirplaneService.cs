@@ -6,6 +6,7 @@ using AirDemo.Domain;
 using AirDemo.Service.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using My.Feed.Providers.Messages;
 using My.Feed.Services;
 
 namespace AirDemo.Service
@@ -13,13 +14,16 @@ namespace AirDemo.Service
     public class AirplaneService : IAirplaneService
     {
         private readonly AirplaneContext _context;
+        private readonly IMessageProvider _messageProvider;
         private readonly MapperConfiguration _map;
 
         public AirplaneService(
             AirplaneContext context,
+            IMessageProvider messageProvider,
             MapperConfiguration map)
         {
             _context = context;
+            _messageProvider = messageProvider;
             _map = map;
         }
 
@@ -39,13 +43,15 @@ namespace AirDemo.Service
 
         public async Task<Result> RegisterNewAirplane(AirplaneAddRequest addRequest)
         {
-            var result = Airplane.RegisterNewAirplane(_context, addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
+            var result = Airplane.RegisterNewAirplane(_context, _messageProvider, addRequest.ModelNumber, addRequest.SerialNumber, addRequest.SeatCount ?? 0, addRequest.WeightInKilos ?? 0);
 
             // Check if action was successful
             if (result)
             {
-                var updatedPlane = await this.GetAirplane(addRequest.SerialNumber);
                 await _context.SaveChangesAsync();
+                var updatedPlane = await this.GetAirplane(addRequest.SerialNumber);
+
+                _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {addRequest.SerialNumber} registered successfully!"));
 
                 // Pass back a DataResult with the inner Data being the AirplaneResponse queried above
                 return SuccessResult.WithData(updatedPlane);

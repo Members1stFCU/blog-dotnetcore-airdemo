@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using AirDemo.Service;
+using My.Feed.Providers.Messages;
 
 namespace AirDemo.Api
 {
@@ -29,6 +30,7 @@ namespace AirDemo.Api
         {
             services.AddDbContext<AirplaneContext>(opt => opt.UseInMemoryDatabase("HelloWorld"));
             services.AddScoped<IAirplaneService, AirplaneService>();
+            services.AddScoped<IMessageProvider, MessageProvider>();
             
             // AutoMapper
             var config = new MapperConfiguration(cfg =>

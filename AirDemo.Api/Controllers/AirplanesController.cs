@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AirDemo.Service;
 using AirDemo.Service.Models;
 using Microsoft.AspNetCore.Mvc;
+using My.Feed.Providers.Messages;
 using My.Feed.Services;
 
 namespace AirDemo.Api.Controllers
@@ -12,10 +13,14 @@ namespace AirDemo.Api.Controllers
     public class AirplanesController : Controller
     {
         private readonly IAirplaneService _service;
+        private readonly IMessageProvider _messageProvider;
 
-        public AirplanesController(IAirplaneService service)
+        public AirplanesController(
+            IAirplaneService service,
+            IMessageProvider messageProvider)
         {
             _service = service;
+            _messageProvider = messageProvider;
         }
 
         // GET api/airplanes
@@ -54,12 +59,16 @@ namespace AirDemo.Api.Controllers
             if (result)
             {
                 // Return 201 with the Location header indicating how to retrieve the resource, and the state of the resource after it was created
-                return Created($"api/airplanes/{request.SerialNumber}", (result as DataResult<AirplaneResponse>)?.Data);
+                return Created($"api/airplanes/{request.SerialNumber}", new
+                {
+                    Data = (result as DataResult<AirplaneResponse>)?.Data,
+                    Messages = _messageProvider.Messages
+                });
             }
             else
             {
                 // There was some reason the resource does not exist in the database, so something was wrong with the request, return 400
-                return BadRequest(result.Error);
+                return BadRequest(_messageProvider.Messages);
             }
         }
 

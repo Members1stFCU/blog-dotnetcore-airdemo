@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using My.Feed.Providers.Messages;
 using My.Feed.Services;
 
 namespace AirDemo.Domain
@@ -11,7 +12,7 @@ namespace AirDemo.Domain
             this.AirplaneId = Guid.NewGuid();
         }
 
-        public static Result RegisterNewAirplane(AirplaneContext context, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
+        public static Result RegisterNewAirplane(AirplaneContext context, IMessageProvider messageProvider, string modelNumber, string serialNumber, int seatCount, decimal weightInKilos)
         {
             var plane = new Airplane
             {
@@ -21,7 +22,7 @@ namespace AirDemo.Domain
                 WeightInKilos = weightInKilos
             };
 
-            var result = plane.IsDuplicate(context);
+            var result = plane.IsDuplicate(context, messageProvider);
             if (result)
             {
                 context.Airplanes.Add(plane);
@@ -62,11 +63,13 @@ namespace AirDemo.Domain
             return new SuccessResult();
         }
 
-        private Result IsDuplicate(AirplaneContext context)
+        private Result IsDuplicate(AirplaneContext context, IMessageProvider messageProvider)
         {
             if (context.Airplanes.Any(x => x.AirplaneId != this.AirplaneId && x.SerialNumber == this.SerialNumber))
             {
-                return new FailResult($"The Serial # {this.SerialNumber} is already taken.");
+                var error = $"The Serial # {this.SerialNumber} is already taken.";
+                messageProvider.AddMessage(new Message(MessageType.Error, error));
+                return new FailResult(error);
             }
             
             return new SuccessResult();
