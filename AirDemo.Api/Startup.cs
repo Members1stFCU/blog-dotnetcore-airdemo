@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using AirDemo.Service;
 using My.Feed.Providers.Messages;
+using My.Feed.Middleware;
 
 namespace AirDemo.Api
 {
@@ -50,6 +51,7 @@ namespace AirDemo.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMvc();
         }
     }

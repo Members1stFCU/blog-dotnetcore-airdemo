@@ -51,7 +51,7 @@ namespace AirDemo.Service
                 await _context.SaveChangesAsync();
                 var updatedPlane = await this.GetAirplane(addRequest.SerialNumber);
 
-                _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {addRequest.SerialNumber} registered successfully!"));
+                _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {addRequest.SerialNumber} registered successfully."));
 
                 // Pass back a DataResult with the inner Data being the AirplaneResponse queried above
                 return SuccessResult.WithData(updatedPlane);
@@ -71,6 +71,8 @@ namespace AirDemo.Service
             var result = airplane.Fly(flyRequest.EstimatedTripTime ?? new TimeSpan(0, 0, 0));
             if (result)
             {
+                _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {serialNumber} began flight for {flyRequest.EstimatedTripTime} hours."));
+
                 await _context.SaveChangesAsync();
             }
 
@@ -88,6 +90,8 @@ namespace AirDemo.Service
             var result = airplane.Land(landRequest.AirportCode);
             if (result)
             {
+                _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {serialNumber} landed at {landRequest.AirportCode}."));
+
                 await _context.SaveChangesAsync();
             }
 
@@ -103,6 +107,7 @@ namespace AirDemo.Service
             }
 
             _context.Airplanes.Remove(airplane);
+            _messageProvider.AddMessage(new Message(MessageType.Success, $"Airplane with Serial # {serialNumber} successfully deleted."));
             await _context.SaveChangesAsync();
             return new SuccessResult();
         }
