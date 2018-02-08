@@ -38,7 +38,7 @@ namespace My.Feed.Middleware
                     messageProvider.AddException(ex);
                 }
 
-                _logger.LogError(ex, ex.Message);
+                _logger.LogCritical(ex, ex.Message);
 
                 if (!context.Response.HasStarted)
                 {
