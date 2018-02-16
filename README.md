@@ -6,6 +6,7 @@ This is a demo project that is used as a resource to go along with the following
 2. [.NET Core REST API in About 30 Minutes](http://devblog.members1st.org/dotnet-core-rest-api-in-about-30-minutes)
 3. [.NET Core Request/Response](http://devblog.members1st.org/dotnet-core-request-response)
 4. [Validation in .NET Core REST API](http://devblog.members1st.org/validation-in-dotnet-core-rest-api)
+5. [.NET Core Messages, Exception, and Logging](http://devblog.members1st.org/dotnet-core-messages-exception-and-logging)
 
 In each post (starting with #3), there will be information at the beginning about which branch of this repo to checkout, which will provide the project as it was at the end of the previous post.
 
